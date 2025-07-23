@@ -85,7 +85,7 @@ window.formVitals = (function() {
                     formAction: form.action,
                     formMethod: form.method,
                     timestamp: event.timeStamp,
-                    data: dataObject,
+                    data: dataObject.toString(),
                     originalEvent: event 
                 };
 
