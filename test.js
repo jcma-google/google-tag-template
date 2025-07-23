@@ -8,26 +8,59 @@ window.formVitals = (function() {
      * @param {FormData} formData The FormData object to convert.
      * @returns {Object} A plain JavaScript object representing the form data.
      */
-    const getObjectFromFormData = (formData) => {
-        const data = {};
-        formData.forEach((value, key) => {
-            console.log(value);
-            console.log(key);
-            // Check if the key already exists.
-            if (Object.prototype.hasOwnProperty.call(data, key)) {
-                console.log(data[key]);
-                // If it's not already an array, convert it to one.
-                if (!Array.isArray(data[key])) {
-                    data[key] = [data[key]];
-                }
-                data[key].push(value);
-            } else {
-                data[key] = value;
-            }
-        });
-        return data;
-    };
+const getFormDataObject = (form) => {
+  const data = {};
+  // Use `form.elements` as it's a live HTMLCollection of all form controls
+  Array.from(form.elements).forEach((field) => {
+    const key = field.name || field.id;
 
+    if (
+      !key ||
+      field.disabled ||
+      ["file", "reset", "submit", "button"].includes(field.type)
+    ) {
+      return;
+    }
+
+    if (field.type === "select-multiple") {
+      data[key] = Array.from(field.options)
+        .filter((option) => option.selected)
+        .map((option) => option.value);
+      return;
+    }
+
+    if (field.type === "checkbox") {
+      if (!data[key]) {
+        data[key] = [];
+      }
+      if (field.checked) {
+        data[key].push(field.value);
+      }
+      return;
+    }
+
+    if (field.type === "radio") {
+      if (field.checked) {
+        data[key] = field.value;
+      }
+      return;
+    }
+
+    data[key] = field.value;
+  });
+
+  // Clean up checkbox arrays: if an array has one item, flatten it. If empty, remove it.
+  for (const key in data) {
+    if (Array.isArray(data[key])) {
+      if (data[key].length === 0) {
+        delete data[key];
+      } else if (data[key].length === 1) {
+        data[key] = data[key][0];
+      }
+    }
+  }
+  return data;
+};
     /**
      * Attaches a 'submit' event listener to all forms on the page.
      * When a form is submitted, it gathers metadata and form field data,
@@ -43,12 +76,7 @@ window.formVitals = (function() {
         // Find all forms on the page and attach the listener.
         document.querySelectorAll('form').forEach(form => {
             form.addEventListener('submit', (event) => {
-                
-                const formData = new FormData(form);
-                console.log(formData);
-
-                // Convert the FormData to a more accessible plain object.
-                const dataObject = getObjectFromFormData(formData);
+                const dataObject = getFormDataObject(form);
                 console.log(dataObject);
                 const formReport = {
                     formElement: form,
