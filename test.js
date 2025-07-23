@@ -45,10 +45,11 @@ window.formVitals = (function() {
                 
                 // Create a FormData object from the submitted form.
                 const formData = new FormData(form);
+                console.log(formData);
 
                 // Convert the FormData to a more accessible plain object.
                 const dataObject = getObjectFromFormData(formData);
-
+                console.log(dataObject);
                 // Construct the report object with useful metadata.
                 const formReport = {
                     formElement: form,
