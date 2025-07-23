@@ -12,7 +12,7 @@ window.formVitals = (function() {
         const data = {};
         formData.forEach((value, key) => {
             console.log(value);
-            console.love(key);
+            console.log(key);
             // Check if the key already exists.
             if (Object.prototype.hasOwnProperty.call(data, key)) {
                 console.log(data[key]);
