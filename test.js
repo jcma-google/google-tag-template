@@ -17,10 +17,8 @@ window.formVitals = (function() {
                 if (!Array.isArray(data[key])) {
                     data[key] = [data[key]];
                 }
-                // Push the new value.
                 data[key].push(value);
             } else {
-                // Otherwise, just set the value.
                 data[key] = value;
             }
         });
@@ -41,17 +39,14 @@ window.formVitals = (function() {
 
         // Find all forms on the page and attach the listener.
         document.querySelectorAll('form').forEach(form => {
-            console.log(form);
             form.addEventListener('submit', (event) => {
                 
-                // Create a FormData object from the submitted form.
                 const formData = new FormData(form);
                 console.log(formData);
 
                 // Convert the FormData to a more accessible plain object.
                 const dataObject = getObjectFromFormData(formData);
                 console.log(dataObject);
-                // Construct the report object with useful metadata.
                 const formReport = {
                     formElement: form,
                     formId: form.id || null,
@@ -60,17 +55,14 @@ window.formVitals = (function() {
                     formMethod: form.method,
                     timestamp: event.timeStamp,
                     data: dataObject,
-                    // Pass the original event so the developer can call preventDefault() if they choose.
                     originalEvent: event 
                 };
 
-                // Execute the user-provided callback with the report.
                 callback(formReport);
             });
         });
     }
 
-    // Expose the public API.
     return {
         onFormSubmit: onFormSubmit
     };
