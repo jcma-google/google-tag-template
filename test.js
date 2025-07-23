@@ -8,59 +8,59 @@ window.formVitals = (function() {
      * @param {FormData} formData The FormData object to convert.
      * @returns {Object} A plain JavaScript object representing the form data.
      */
-const getFormDataObject = (form) => {
-  const data = {};
-  // Use `form.elements` as it's a live HTMLCollection of all form controls
-  Array.from(form.elements).forEach((field) => {
-    const key = field.name || field.id;
-
-    if (
-      !key ||
-      field.disabled ||
-      ["file", "reset", "submit", "button"].includes(field.type)
-    ) {
-      return;
-    }
-
-    if (field.type === "select-multiple") {
-      data[key] = Array.from(field.options)
-        .filter((option) => option.selected)
-        .map((option) => option.value);
-      return;
-    }
-
-    if (field.type === "checkbox") {
-      if (!data[key]) {
-        data[key] = [];
+    const getFormDataObject = (form) => {
+      const data = {};
+      Array.from(form.elements).forEach((field) => {
+        const key = field.name || field.id;
+    
+        if (!key || field.disabled ||
+          ["file", "reset", "submit", "button"].includes(field.type)
+        ) {
+          return;
+        }
+    
+        if (field.type === "select-multiple") {
+          data[key] = Array.from(field.options)
+            .filter((option) => option.selected)
+            .map((option) => option.value);
+          return;
+        }
+    
+        if (field.type === "checkbox") {
+          if (!data[key]) {
+            data[key] = [];
+          }
+          if (field.checked) {
+            data[key].push(field.value);
+          }
+          return;
+        }
+    
+        if (field.type === "radio") {
+          if (field.checked) {
+            data[key] = field.value;
+          }
+          return;
+        }
+        const piiRegex = /phone|email|name/i;
+        if (!key.match(piiRegex)) {
+            data[key] = field.value;
+        }
+      });
+    
+      // Clean up checkbox arrays: if an array has one item, flatten it. If empty, remove it.
+      for (const key in data) {
+        if (Array.isArray(data[key])) {
+          if (data[key].length === 0) {
+            delete data[key];
+          } else if (data[key].length === 1) {
+            data[key] = data[key][0];
+          }
+        }
       }
-      if (field.checked) {
-        data[key].push(field.value);
-      }
-      return;
-    }
+      return data;
+    };
 
-    if (field.type === "radio") {
-      if (field.checked) {
-        data[key] = field.value;
-      }
-      return;
-    }
-
-    data[key] = field.value;
-  });
-
-  // Clean up checkbox arrays: if an array has one item, flatten it. If empty, remove it.
-  for (const key in data) {
-    if (Array.isArray(data[key])) {
-      if (data[key].length === 0) {
-        delete data[key];
-      } else if (data[key].length === 1) {
-        data[key] = data[key][0];
-      }
-    }
-  }
-  return data;
-};
     /**
      * Attaches a 'submit' event listener to all forms on the page.
      * When a form is submitted, it gathers metadata and form field data,
