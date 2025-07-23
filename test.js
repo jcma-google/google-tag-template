@@ -41,6 +41,7 @@ window.formVitals = (function() {
 
         // Find all forms on the page and attach the listener.
         document.querySelectorAll('form').forEach(form => {
+            console.log(form);
             form.addEventListener('submit', (event) => {
                 
                 // Create a FormData object from the submitted form.
