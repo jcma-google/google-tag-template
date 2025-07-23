@@ -11,8 +11,11 @@ window.formVitals = (function() {
     const getObjectFromFormData = (formData) => {
         const data = {};
         formData.forEach((value, key) => {
+            console.log(value);
+            console.love(key);
             // Check if the key already exists.
             if (Object.prototype.hasOwnProperty.call(data, key)) {
+                console.log(data[key]);
                 // If it's not already an array, convert it to one.
                 if (!Array.isArray(data[key])) {
                     data[key] = [data[key]];
